@@ -1,10 +1,9 @@
-package it.achtelik.basics.mongo
+package it.achtelik.ktor_mongodb_mongock.basics.mongo
 
 import com.mongodb.ConnectionString
 import com.mongodb.MongoClientSettings
-import com.mongodb.reactivestreams.client.MongoClient
-import com.mongodb.reactivestreams.client.MongoClients
-import com.mongodb.reactivestreams.client.MongoDatabase
+import com.mongodb.kotlin.client.coroutine.MongoClient
+import com.mongodb.kotlin.client.coroutine.MongoDatabase
 import io.ktor.server.application.*
 import org.bson.UuidRepresentation
 
@@ -13,13 +12,13 @@ object MongoDbConfig {
     private lateinit var database: MongoDatabase
 
     fun configure(connection: String, database: String) {
-        client = MongoClients.create(
+        client = MongoClient.create(
             MongoClientSettings.builder()
-                // We want to use readable UUIDs as primary ids.
+                // We want to use UUIDs as type at our DOC objects.
                 .uuidRepresentation(UuidRepresentation.STANDARD)
                 .applyConnectionString(ConnectionString(connection)).build()
         )
-        this.database = client.getDatabase(database)
+        MongoDbConfig.database = client.getDatabase(database)
     }
 
     fun client(): MongoClient {
@@ -36,5 +35,5 @@ fun Application.configureMongo() {
     val database = environment.config.propertyOrNull("mongo.database")?.getString() ?: ""
     MongoDbConfig.configure(connection, database)
 
-    MongoMigration.execute(MongoDbConfig.client(), database)
+    MongoMigration.execute(connection, database)
 }

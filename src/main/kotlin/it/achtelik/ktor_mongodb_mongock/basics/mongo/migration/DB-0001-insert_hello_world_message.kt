@@ -1,4 +1,4 @@
-package it.achtelik.basics.mongo.migration
+package it.achtelik.ktor_mongodb_mongock.basics.mongo.migration
 
 import com.mongodb.client.result.InsertOneResult
 import com.mongodb.reactivestreams.client.MongoDatabase
@@ -22,15 +22,16 @@ class `DB-0001-insert_hello_world_message` {
         val document = Document.parse(
             """
                 {
-                "_id": "${UUID.randomUUID()}",
+                "_id": UUID("${UUID.randomUUID()}"),
                 "content":"Hello World",
-                "createdAt":"${Instant.now()}",
+                "createdAt": ISODate("${Instant.now()}"),
                 }
             """.trimIndent()
 
         )
 
         // That's the way how Mongock needs to do changes with reactive drivers.
+        // Kotlin Coroutine is based on the reactive client.
         // See: https://docs.mongock.io/v5/driver/mongodb-reactive/#code-example
         val subscriber = MongoSubscriberSync<InsertOneResult>()
         database.getCollection("messages").insertOne(document).subscribe(subscriber)
