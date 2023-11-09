@@ -10,10 +10,10 @@ import org.bson.UuidRepresentation
 class MongoMigration {
     companion object {
         fun execute(connection: String, database: String) {
-            // Kotlin Coroutine is based on the reactive client.
+            // Kotlin Coroutine is based on the reactive client and Mongock doesn"t know the coroutine Driver.
             val client = MongoClients.create(
                 MongoClientSettings.builder()
-                    // We want to use readable UUIDs as primary ids.
+                    // We want to use UUIDs as type at our DOC objects.
                     .uuidRepresentation(UuidRepresentation.STANDARD)
                     .applyConnectionString(ConnectionString(connection)).build()
             )

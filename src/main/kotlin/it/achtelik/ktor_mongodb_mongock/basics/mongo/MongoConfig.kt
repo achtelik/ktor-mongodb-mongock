@@ -7,7 +7,16 @@ import com.mongodb.kotlin.client.coroutine.MongoDatabase
 import io.ktor.server.application.*
 import org.bson.UuidRepresentation
 
-object MongoDbConfig {
+fun Application.configureMongo() {
+    val connection = environment.config.propertyOrNull("mongo.connection")?.getString() ?: ""
+    val database = environment.config.propertyOrNull("mongo.database")?.getString() ?: ""
+
+    MongoConfig.configure(connection, database)
+
+    MongoMigration.execute(connection, database)
+}
+
+object MongoConfig {
     private lateinit var client: MongoClient
     private lateinit var database: MongoDatabase
 
@@ -18,7 +27,7 @@ object MongoDbConfig {
                 .uuidRepresentation(UuidRepresentation.STANDARD)
                 .applyConnectionString(ConnectionString(connection)).build()
         )
-        MongoDbConfig.database = client.getDatabase(database)
+        MongoConfig.database = client.getDatabase(database)
     }
 
     fun client(): MongoClient {
@@ -28,12 +37,4 @@ object MongoDbConfig {
     fun database(): MongoDatabase {
         return database
     }
-}
-
-fun Application.configureMongo() {
-    val connection = environment.config.propertyOrNull("mongo.connection")?.getString() ?: ""
-    val database = environment.config.propertyOrNull("mongo.database")?.getString() ?: ""
-    MongoDbConfig.configure(connection, database)
-
-    MongoMigration.execute(connection, database)
 }

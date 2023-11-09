@@ -1,12 +1,12 @@
 package it.achtelik.ktor_mongodb_mongock.modules.messages.dataproviders.mongo
 
-import it.achtelik.ktor_mongodb_mongock.basics.mongo.MongoDbConfig
+import it.achtelik.ktor_mongodb_mongock.basics.mongo.MongoConfig
 import kotlinx.coroutines.flow.toList
 import java.time.Instant
 import java.util.UUID
 
 class MessageRepository {
-    private val collection = MongoDbConfig.database().getCollection<MessageDOC>("messages")
+    private val collection = MongoConfig.database().getCollection<MessageDOC>("messages")
 
     suspend fun find(): List<MessageDOC> {
         return collection.find().toList()
